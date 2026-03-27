@@ -1,122 +1,132 @@
-/* --- CONFIGURACIÓN BASE --- */
-body {
+/* --- CONFIGURACIÓN GLOBAL --- */
+html, body {
     margin: 0;
-    min-height: 100vh;
-    display: flex;
-    flex-direction: column;
-    background-color: #050505; /* Negro profundo */
-    color: white;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    overflow-x: hidden;
-}
-
-/* --- NUEVO FONDO CON IMAGEN --- */
-.bg-cyber {
-    position: fixed;
-    top: 0;
-    left: 0;
+    padding: 0;
     width: 100%;
     height: 100%;
-    
-    /* Asegúrate de que el nombre del archivo coincida exactamente */
-    background-image: url('../img/fondo_cyber.png'); 
-    
-    /* Ajustes para que se vea perfecta */
-    background-size: cover;          /* Cubre toda la pantalla */
-    background-position: center;    /* Centra las ondas */
-    background-repeat: no-repeat;   /* No repite */
-    
-    /* Capa oscura sutil opcional para mejorar legibilidad */
-    /* background-color: rgba(0, 0, 0, 0.3); */
-    
-    z-index: -1; /* Detrás de todo */
+    background: transparent; 
+    color: white;
+    font-family: 'JetBrains Mono', monospace;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
 }
 
-/* --- HEADER ESTILO NEÓN MAGENTA/MORADO --- */
+/* --- FONDO DINÁMICO --- */
+.bg-cyber {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100vw; height: 100vh;
+    background-image: url('../img/fondo_cyber.png'); 
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    z-index: -2;
+}
+
+.bg-cyber::after {
+    content: "";
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background: rgba(0, 0, 0, 0.3); /* Capa de contraste */
+    z-index: -1;
+}
+
+/* --- NAVBAR --- */
 .glass-nav {
-    background: rgba(0, 0, 0, 0.85);
+    background: rgba(0, 0, 0, 0.8);
     backdrop-filter: blur(10px);
-    
-    /* Borde inferior Morado Eléctrico */
-    border-bottom: 2px solid #b927fc; 
-    padding: 15px 0;
+    border-bottom: 2px solid #b927fc;
+    padding: 12px 0;
+    z-index: 10;
 }
 
 .nav-title {
-    /* Texto Magenta Neón */
-    color: #ff00ff; 
-    font-size: 1.5rem;
+    color: #ff00ff;
     font-weight: bold;
-    letter-spacing: 3px;
-    font-family: 'Courier New', Courier, monospace; /* Fuente tipo código */
-    
-    /* Efecto de neón magenta y morado */
-    text-shadow: 0 0 10px #ff00ff, 
-                 0 0 20px #b927fc;
+    letter-spacing: 4px;
+    text-shadow: 0 0 15px #ff00ff;
 }
 
-/* --- CUADRO PRINCIPAL GLASSMORPHISM (AJUSTADO) --- */
+/* --- CENTRADO --- */
+main {
+    flex-grow: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* --- CUADRO GLASSMORPHISM PRO --- */
 #miCuadroGlass {
-    background: rgba(255, 255, 255, 0.03); /* Fondo muy transparente */
-    backdrop-filter: blur(15px);          /* Desenfoque fuerte */
-    -webkit-backdrop-filter: blur(15px);
-    
-    /* Borde Magenta sutil */
-    border: 1px solid rgba(255, 0, 255, 0.2); 
+    background: rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(20px) saturate(180%);
+    -webkit-backdrop-filter: blur(20px) saturate(180%);
+    border: 1px solid rgba(255, 0, 255, 0.2);
     border-radius: 30px;
-    padding: 25px;
-    box-shadow: 0 25px 50px rgba(0,0,0,0.6); /* Sombra profunda */
-    margin: 20px 0;
-    width: 650px; /* Ancho fijo para centrar canvas */
+    padding: 30px;
+    box-shadow: 0 20px 50px rgba(0,0,0,0.8);
+    width: 650px;
+    position: relative;
+    overflow: hidden; /* Para el efecto brillo */
 }
 
-/* Título de la simulación */
-#miCuadroGlass h3 {
-    color: #b927fc; /* Morado Eléctrico */
-    font-family: sans-serif;
-    text-shadow: 0 0 10px rgba(185, 39, 252, 0.5);
+/* Efecto Brillo (Shine) */
+#miCuadroGlass::before {
+    content: "";
+    position: absolute;
+    top: -50%; left: -50%;
+    width: 200%; height: 200%;
+    background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.08), transparent);
+    transform: rotate(45deg);
+    animation: shine 8s infinite;
 }
 
-/* Estilo para el Canvas */
+@keyframes shine {
+    0% { transform: translateX(-150%) rotate(45deg); }
+    20% { transform: translateX(150%) rotate(45deg); }
+    100% { transform: translateX(150%) rotate(45deg); }
+}
+
+/* Esquinas Neón Decorativas */
+#miCuadroGlass::after {
+    content: "";
+    position: absolute;
+    top: 0; left: 0;
+    width: 30px; height: 30px;
+    border-top: 4px solid #ff00ff;
+    border-left: 4px solid #ff00ff;
+    border-radius: 25px 0 0 0;
+}
+
 canvas {
-    background: rgba(0, 0, 0, 0.7); /* Fondo oscuro para el canvas */
+    background: rgba(0, 0, 0, 0.6);
     border-radius: 15px;
     border: 1px solid rgba(255, 255, 255, 0.1);
-    cursor: crosshair; /* Cursor de precisión */
+    width: 100%;
 }
 
-/* Barra de Estado inferior */
 .status-bar {
-    font-family: 'Courier New', Courier, monospace;
-    
-    /* Texto Magenta brillante */
-    color: #ff00ff; 
-    font-size: 0.85rem;
-    text-shadow: 0 0 5px rgba(255, 0, 255, 0.5);
+    color: #ff00ff;
+    font-size: 0.8rem;
+    text-align: center;
+    margin-top: 15px;
+    opacity: 0.8;
 }
 
-/* --- FOOTER AZUL METÁLICO (MANTENIDO) --- */
-/* (Combina bien porque el morado tiene azul) */
+/* --- FOOTER METÁLICO --- */
 .metal-footer {
-    background: linear-gradient(135deg, rgba(10, 40, 70, 0.8) 0%, rgba(20, 80, 120, 0.6) 100%);
-    backdrop-filter: blur(8px);
-    border: 2px solid #1499de; /* Borde azul metálico */
+    background: linear-gradient(135deg, rgba(10, 40, 70, 0.95), rgba(20, 80, 120, 0.8));
+    border: 2px solid #1499de;
     border-radius: 15px;
-    padding: 15px 40px;
-    margin-top: 20px;
-    margin-bottom: 20px; /* Espacio abajo */
-    box-shadow: 0 0 20px rgba(20, 153, 222, 0.3), inset 0 0 10px rgba(255,255,255,0.1);
-    text-align: center;
+    padding: 12px 30px;
+    margin: 0 auto 20px auto;
+    width: fit-content;
+    box-shadow: 0 0 20px rgba(20, 153, 222, 0.4);
 }
 
 .copy-text {
     margin: 0;
-    font-size: 0.9rem;
-    color: #d1e8ff; /* Azul muy pálido */
-    text-shadow: 0 0 5px rgba(20, 153, 222, 0.5);
-}
-
-.copy-text strong {
-    color: #ffffff;
-    text-decoration: underline #1499de; /* Subrayado azul */
+    font-size: 0.85rem;
+    color: #d1e8ff;
 }
