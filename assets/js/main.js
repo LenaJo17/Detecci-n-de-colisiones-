@@ -1,6 +1,3 @@
-/**
- * Simulación de Burbujas - Lógica de Niveles y Movimiento Aleatorio
- */
 function initBounce(totalParticles, canvasId) {
     const canvas = document.getElementById(canvasId);
     const ctx = canvas.getContext('2d');
@@ -10,20 +7,22 @@ function initBounce(totalParticles, canvasId) {
     let currentLevel = 1;
     let mouse = { x: 0, y: 0 };
 
-    const baseColors = ['#00f2fe', '#00c3ff', '#00d4ff'];
-    const hoverColor = '#b927fc'; // Morado al detectar mouse
+    // --- NUEVA PALETA DE COLORES (Magenta/Morado) ---
+    const baseColors = ['#b927fc', '#8a2be2', '#ff00ff']; // Morado Neón, Violeta, Magenta
+    const hoverColor = '#ff66ff'; // Magenta brillante al detectar mouse
 
-    // 1. Detección de coordenadas con corrección de escala
+    // Detección de movimiento del mouse corregida
     canvas.addEventListener('mousemove', (e) => {
         const rect = canvas.getBoundingClientRect();
         mouse.x = (e.clientX - rect.left) * (canvas.width / rect.width);
         mouse.y = (e.clientY - rect.top) * (canvas.height / rect.height);
     });
 
-    // 2. Clic para explotar (Desaparición lenta)
+    // Clic para explotar burbujas
     canvas.addEventListener('mousedown', () => {
         particles.forEach(p => {
             const dist = Math.hypot(p.x - mouse.x, p.y - mouse.y);
+            // Si el mouse está sobre la burbuja y no está explotando
             if (dist < p.radius && !p.isExploding) {
                 p.explode();
             }
@@ -37,48 +36,40 @@ function initBounce(totalParticles, canvasId) {
         }
 
         reset() {
-            this.radius = Math.random() * 10 + 12;
+            this.radius = Math.random() * 8 + 12; // Tamaño aleatorio
             this.isExploding = false;
             this.opacity = 1;
-            
-            // Inicio: Fuera de la pantalla abajo
             this.x = Math.random() * canvas.width;
-            this.y = canvas.height + this.radius + Math.random() * 50;
+            this.y = canvas.height + 50; // Aparecen desde abajo
             
-            // Movimiento: Hacia arriba con velocidad según el nivel
-            this.baseSpeed = 0.5 + (currentLevel * 0.4); 
-            this.vy = -this.baseSpeed;
+            // Velocidad base que aumenta con el nivel
+            this.speed = (Math.random() * 0.5 + 0.5) * (1 + currentLevel * 0.3);
             
-            // Viaje aleatorio: Oscilación lateral
-            this.randomXFactor = (Math.random() - 0.5) * 1.5;
-            
+            this.vx = (Math.random() - 0.5) * 1.2; // Movimiento horizontal aleatorio
             this.color = baseColors[Math.floor(Math.random() * baseColors.length)];
         }
 
         explode() {
             this.isExploding = true;
             eliminatedCount++;
-            
-            // Lógica de Niveles: Grupos de 10
-            if (eliminatedCount % 10 === 0) {
-                currentLevel++;
-            }
+            // Cada 10 burbujas, sube de nivel
+            if (eliminatedCount % 10 === 0) currentLevel++;
         }
 
         update() {
             if (this.isExploding) {
-                this.radius += 1.2; // Expansión de burbuja
-                this.opacity -= 0.03; // Desvanecimiento lento
-                if (this.opacity <= 0) this.reset();
+                // Efecto de explosión (crece y desaparece)
+                this.radius += 2;
+                this.opacity -= 0.05;
+                if (this.opacity <= 0) this.reset(); // Reaparece
             } else {
-                this.y += this.vy;
-                // "Viaje aleatorio": se mueve un poco de lado a lado
-                this.x += Math.sin(this.y * 0.05) * this.randomXFactor;
-
-                // Si termina de subir y sale del canvas, reinicia abajo
-                if (this.y + this.radius < -20) {
-                    this.reset();
-                }
+                // Movimiento normal hacia arriba
+                this.y -= this.speed;
+                // Movimiento oscilante sutil
+                this.x += Math.sin(this.y * 0.04) * this.vx;
+                
+                // Si sale de la pantalla, reaparece abajo
+                if (this.y < -50) this.reset();
             }
             this.draw();
         }
@@ -91,23 +82,24 @@ function initBounce(totalParticles, canvasId) {
 
             const dist = Math.hypot(this.x - mouse.x, this.y - mouse.y);
             
-            // Cambio de color a MORADO al detectar mouse
+            // Si el mouse está sobre la burbuja, cambia de color (feedback visual)
             if (dist < this.radius && !this.isExploding) {
-                ctx.fillStyle = hoverColor;
+                ctx.fillStyle = hoverColor; // Magenta brillante
                 ctx.shadowBlur = 15;
                 ctx.shadowColor = hoverColor;
             } else {
-                ctx.fillStyle = this.color + '66'; // Transparencia glass
-                ctx.strokeStyle = this.color;
-                ctx.lineWidth = 1.5;
+                // Color normal (relleno transparente y borde neón)
+                ctx.fillStyle = this.color + '55'; // Agrega transparencia al relleno
+                ctx.strokeStyle = this.color;     // Borde neón
+                ctx.lineWidth = 2;
                 ctx.stroke();
             }
-
             ctx.fill();
             
+            // Dibuja el ID (número) dentro de la burbuja
             if (!this.isExploding) {
-                ctx.fillStyle = "#fff";
-                ctx.font = "10px monospace";
+                ctx.fillStyle = "white";
+                ctx.font = "bold 10px sans-serif";
                 ctx.textAlign = "center";
                 ctx.fillText(this.id, this.x, this.y + 4);
             }
@@ -115,31 +107,29 @@ function initBounce(totalParticles, canvasId) {
         }
     }
 
-    // Inicializar elementos
-    for (let i = 1; i <= 15; i++) {
+    // Crear las partículas iniciales
+    for (let i = 1; i <= totalParticles; i++) {
         particles.push(new Particle(i));
     }
 
-    // Mostrar estadísticas: Numérica y Porcentual
-    function drawStats() {
-        ctx.fillStyle = "#00f2fe";
-        ctx.font = "bold 12px monospace";
-        
-        // El porcentaje se calcula en base al grupo de 10 del nivel actual
-        const levelProgress = (eliminatedCount % 10) * 10; 
-
-        ctx.fillText(`> ELIMINATED: ${eliminatedCount} units`, 20, 30);
-        ctx.fillText(`> LEVEL PROGRESS: ${levelProgress}%`, 20, 50);
-        ctx.fillText(`> CURRENT LEVEL: ${currentLevel.toString().padStart(2, '0')}`, 20, 70);
-        ctx.fillText(`> VELOCITY_INDEX: x${(1 + currentLevel * 0.4).toFixed(1)}`, 20, 90);
-    }
-
+    // Función principal de animación
     function animate() {
+        // Limpiar el canvas en cada frame
         ctx.clearRect(0, 0, canvas.width, canvas.height);
+        
+        // Actualizar y dibujar cada partícula
         particles.forEach(p => p.update());
-        drawStats();
+        
+        // Dibuja el marcador superior (Estadísticas)
+        ctx.fillStyle = "#ff00ff"; // Texto Magenta
+        ctx.font = "bold 12px monospace";
+        const progress = (eliminatedCount % 10) * 10;
+        ctx.fillText(`> ELIMINATED: ${eliminatedCount} | LEVEL: ${currentLevel.toString().padStart(2, '0')} | PROGRESS: ${progress}%`, 20, 30);
+        
+        // Solicitar el siguiente frame
         requestAnimationFrame(animate);
     }
 
+    // Iniciar la animación
     animate();
 }
