@@ -1,0 +1,82 @@
+/* RESET PARA ELIMINAR EL BLANCO */
+html, body {
+    margin: 0 !important;
+    padding: 0 !important;
+    width: 100% !important;
+    height: 100% !important;
+    background-color: #000 !important;
+    color: #fff !important;
+    overflow: hidden !important;
+    display: flex !important;
+    flex-direction: column !important;
+}
+
+/* Fondo azul profundo como tu referencia */
+.bg-cyber {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background: radial-gradient(circle at center, #001d3d 0%, #000000 100%) !important;
+    z-index: -1;
+}
+
+/* NAVBAR Y FOOTER */
+.navbar.glass, footer.glass {
+    background: rgba(0, 0, 0, 0.7) !important;
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid rgba(0, 242, 254, 0.2);
+}
+
+.navbar-brand, h3 {
+    color: #00f2fe !important;
+    text-shadow: 0 0 10px #00f2fe;
+}
+
+/* CUADRO PEQUEÑO Y EFECTO CRISTAL */
+#miCuadroGlass {
+    position: relative !important;
+    background: rgba(255, 255, 255, 0.05) !important;
+    backdrop-filter: blur(25px) saturate(180%) !important;
+    -webkit-backdrop-filter: blur(25px) saturate(180%) !important;
+    border-radius: 40px !important;
+    padding: 30px !important;
+    border: 1px solid rgba(0, 242, 254, 0.3) !important;
+    box-shadow: 0 20px 50px rgba(0,0,0,0.9) !important;
+    
+    /* FORZAMOS TAMAÑO PEQUEÑO */
+    width: 500px !important; 
+    max-width: 95% !important;
+    margin: auto !important;
+    overflow: hidden;
+}
+
+/* LA LÍNEA DE ESCÁNER (EFECTO DE LUZ) */
+#miCuadroGlass::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 60%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(0, 242, 254, 0.15), transparent);
+    transform: skewX(-25deg);
+    animation: scanner 5s infinite ease-in-out;
+}
+
+@keyframes scanner {
+    0% { left: -100%; }
+    35% { left: 150%; }
+    100% { left: 150%; }
+}
+
+canvas {
+    width: 100% !important;
+    background: rgba(0, 0, 0, 0.4) !important;
+    border-radius: 20px;
+}
+
+.status-bar {
+    font-family: monospace;
+    color: #00f2fe;
+    margin-top: 15px;
+}
